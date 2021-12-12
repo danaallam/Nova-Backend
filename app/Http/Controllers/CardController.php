@@ -44,6 +44,7 @@ class CardController extends Controller
             foreach($c->categories as $cat){
                 $cat->category;
             }
+
             for ($i = 0; $i<sizeof($c->users); $i++)
                 $count++;
             $c->applicants = $count;

@@ -2,24 +2,35 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Freelancer;
 use App\Models\User;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
+use mysql_xdevapi\Exception;
 
 class FreelancerController extends Controller
 {
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function register(Request $request)
     {
         $user = new User();
-        $user->name = $request->name;
-        $user->email = $request->email;
-        $user->password = $request->password;
-        if($user->profile != null)
-            $user->profile = $request->email;
-        $user->save();
-        $token = auth('user')->login($user);
-
-        return $this->respondWithToken($token);
+        try{
+            $user->name = $request->name;
+            $user->email = $request->email;
+            $user->password = $request->password;
+            if($user->profile != null)
+                $user->profile = $request->file('profile')->store('tailorProfile');
+            $user->save();
+            $token = auth('user')->login($user);
+            return $this->respondWithToken($token);
+        } catch (QueryException $e){
+            $errorCode = $e->errorInfo[1];
+            if($errorCode == 1062){
+                return response()->json(['message'=>'email is taken']);
+            }
+        }
     }
 
     public function login()
@@ -27,7 +38,7 @@ class FreelancerController extends Controller
         $credentials = request(['email', 'password']);
 
         if (! $token = auth('user')->attempt($credentials)) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['error' => 'Invalid email or password'], 401);
         }
 
         return $this->respondWithToken($token);
