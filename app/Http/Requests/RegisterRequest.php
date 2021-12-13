@@ -18,6 +18,14 @@ class RegisterRequest extends FormRequest
         return true;
     }
 
+    public function messages(){
+        return [
+            'name.required' => 'This field is required',
+            'email.required' => 'This field is required',
+            'password.required' => 'This field is required',
+        ];
+    }
+
     /**
      * Get the validation rules that apply to the request.
      *
@@ -31,18 +39,4 @@ class RegisterRequest extends FormRequest
             'password' => 'required|min:3'
         ];
     }
-
-//        protected function failedValidation(Validator $validator)
-//    {
-//
-//        $errors = collect($validator->errors());
-//        $response = response()->json([
-//            'success' => false,
-//            'message' => 'Errors occured',
-//            'errors' => $errors
-//        ],400);
-//
-//        throw (new ValidationException($validator,$response));
-//
-//    }
 }
