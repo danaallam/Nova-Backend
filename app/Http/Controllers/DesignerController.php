@@ -39,6 +39,10 @@ class DesignerController extends Controller
         return response()->json(['message' => 'Successfully logged out']);
     }
 
+    public function checkToken(){
+        return response()->json(['status' => 200, "user"=>auth('designer')->user()]);
+    }
+
     protected function respondWithToken($token)
     {
         return response()->json([

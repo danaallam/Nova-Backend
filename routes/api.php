@@ -24,6 +24,7 @@ Route::group(['prefix' => 'user'], function() {
     Route::post('/login', ['App\Http\Controllers\FreelancerController', 'login']);
 
     Route::group(['middleware' => ['jwt.user']], function () {
+        Route::get('/checkToken', ['App\Http\Controllers\FreelancerController', 'checkToken']);
         Route::post('/logout', ['App\Http\Controllers\FreelancerController', 'logout']);
         Route::resource('/category', 'App\Http\Controllers\FreelancerCategoryController')->only([
             'index', 'store', 'show', 'update', 'destroy'
@@ -45,6 +46,7 @@ Route::group(['prefix' => 'designer'], function() {
     Route::post('/login', ['App\Http\Controllers\DesignerController', 'login']);
 
     Route::group(['middleware' => ['jwt.designer']], function () {
+        Route::get('/checkToken', ['App\Http\Controllers\DesignerController', 'checkToken']);
         Route::post('/logout', ['App\Http\Controllers\DesignerController', 'logout']);
         Route::resource('/card', 'App\Http\Controllers\CardController')->only([
             'store', 'show', 'update', 'destroy'

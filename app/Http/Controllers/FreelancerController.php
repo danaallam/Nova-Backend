@@ -18,7 +18,7 @@ class FreelancerController extends Controller
         $user->name = $request->name;
         $user->email = $request->email;
         $user->password = $request->password;
-        if($user->profile != null)
+        if($request->file('profile') != null)
             $user->profile = $request->file('profile')->store('tailorProfile');
         $user->save();
         $token = auth('user')->login($user);
@@ -41,6 +41,10 @@ class FreelancerController extends Controller
         auth('user')->logout();
 
         return response()->json(['message' => 'Successfully logged out']);
+    }
+
+    public function checkToken(){
+        return response()->json(['status' => 200, "user"=>auth('user')->user()]);
     }
 
     protected function respondWithToken($token)
