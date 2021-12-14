@@ -25,6 +25,7 @@ class CategoryController extends Controller
         $input = $request->all();
         $category = new Category();
         $category->name = $input['name'];
+        $category->photo = $request->file('photo')->store('photo');
         $category->save();
         return response()->json(['message'=>'Category created', 'category'=>$category]);
     }

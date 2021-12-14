@@ -68,9 +68,11 @@ return [
 
     'links' => [
         public_path('tailorProfile') => storage_path('app/tailorProfile'),
+        public_path('designerProfile') => storage_path('app/designerProfile'),
         public_path('coverLetter') => storage_path('app/coverLetter'),
         public_path('resume') => storage_path('app/resume'),
         public_path('posts') => storage_path('app/posts'),
+        public_path('photo') => storage_path('app/photo'),
     ],
 
 ];

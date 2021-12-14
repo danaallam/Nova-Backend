@@ -2,16 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\DesignerRequest;
 use App\Models\Designer;
 use Illuminate\Http\Request;
 
 class DesignerController extends Controller
 
 {
-    public function register(Request $request)
+    public function register(DesignerRequest $request)
     {
         $designer = new Designer();
         $designer->name = $request->name;
+        if($request->file('profile') != null)
+            $designer->profile = $request->file('profile')->store('designerProfile');
         $designer->email = $request->email;
         $designer->password = $request->password;
         $designer->profession = $request->profession;
