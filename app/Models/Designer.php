@@ -59,4 +59,7 @@ class Designer extends Authenticatable implements JWTSubject
         return $this->hasMany(Card::class, 'designer_id', 'id');
     }
 
+    public function ratings(){
+        return $this->hasMany(Rating::class, 'designer_id', 'id');
+    }
 }

@@ -17,7 +17,7 @@ class CreateRatingsTable extends Migration
             $table->id();
             $table->integer('rating');
             $table->bigInteger('freelancer_id');
-            $table->bigInteger('card_id');
+            $table->bigInteger('designer_id');
             $table->timestamps();
         });
     }

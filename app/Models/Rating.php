@@ -12,7 +12,7 @@ class Rating extends Model
         return $this->belongsTo(Freelancer::class, 'freelancer_id', 'id');
     }
 
-    public function card(){
-        return $this->belongsTo(Card::class, 'card_id', 'id');
+    public function designer(){
+        return $this->belongsTo(Designer::class, 'designer_id', 'id');
     }
 }

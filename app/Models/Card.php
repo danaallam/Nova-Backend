@@ -9,10 +9,6 @@ class Card extends Model
 {
     use HasFactory;
 
-    public function ratings(){
-        return $this->hasMany(Rating::class, 'card_id', 'id');
-    }
-
     public function savedCards(){
         return $this->hasMany(Saved::class, 'card_id', 'id');
     }

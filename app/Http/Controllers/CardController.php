@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Card;
 use App\Models\CardCategory;
+use App\Models\Designer;
 use App\Models\FreelancerCategory;
+use App\Models\Rating;
 use Illuminate\Http\Request;
 
 class CardController extends Controller
@@ -15,32 +17,42 @@ class CardController extends Controller
     public function index()
     {
         $freecats = FreelancerCategory::with('category.cardCategory')->where("freelancer_id", auth('user')->user()->id)->get();
+        $designerRat = Designer::with('ratings')->get();
         $cards = [];
+
         foreach ($freecats as $c){
             foreach ($c->category->cardCategory as $one){
                     array_push($cards, $one->card);
+            }
+        }
+
+        foreach ($designerRat as $d) {
+            if (sizeof($d->ratings) > 0) {
+                $sum = 0;
+                foreach ($d->ratings as $instance) {
+                    $sum += $instance->rating;
                 }
+                if (($sum / sizeof($d->ratings) - floor($sum / sizeof($d->ratings)) >= 0.75)) {
+                    $d->rating = ceil($sum / sizeof($d->ratings));
+                } else {
+                    $d->rating = floor($sum / sizeof($d->ratings));
+                }
+            }
+            else{
+                $d->rating = 0;
+            }
         }
 
         foreach ($cards as $c) {
             $count = 0;
-            if (sizeof($c->ratings) > 0) {
-                $sum = 0;
-                foreach ($c->ratings as $instance) {
-                    $sum += $instance->rating;
-                }
-                if (($sum / sizeof($c->ratings) - floor($sum / sizeof($c->ratings)) >= 0.75)) {
-                    $c->rating = ceil($sum / sizeof($c->ratings));
-                } else {
-                    $c->rating = floor($sum / sizeof($c->ratings));
-                }
-            }
-            else{
-                $c->rating = 0;
-            }
 
             $c->posts;
-            $c->designer;
+
+            foreach ($designerRat as $d) {
+                if($d->id == $c->designer->id) {
+                    $c->designer->rating = $d->rating;
+                }
+            }
             foreach($c->categories as $cat){
                 $cat->category;
             }
