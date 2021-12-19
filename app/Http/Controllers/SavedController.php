@@ -56,12 +56,22 @@ class SavedController extends Controller
 
     /**
      * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Saved  $saved
-     * @return \Illuminate\Http\Response
+     * @param $id
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy(Saved $saved)
+    public function destroy($id)
     {
-        //
+        $savedCard = Saved::where('card_id', $id)->where('freelancer_id', auth('user')->user()->id)->first();
+        if($savedCard) {
+            $savedCard->delete();
+            return response()->json([
+                'status' => '200',
+                'message' => 'Card removed from saved'
+            ]);
+        }
+        return response()->json([
+            'status' => '200',
+            'message' => 'Card not found'
+        ]);
     }
 }

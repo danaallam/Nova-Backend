@@ -12,7 +12,7 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        $category = Category::with('freelancerCategory.freelancer', 'cardCategory.card.designer')->get();
+        $category = Category::all();
         return response()->json(['status'=>200, 'category'=>$category]);
     }
 

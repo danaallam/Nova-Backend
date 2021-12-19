@@ -30,13 +30,21 @@ Route::group(['prefix' => 'user'], function() {
             'index', 'store', 'show', 'update', 'destroy'
         ]);
         Route::resource('/ownCard', 'App\Http\Controllers\FreelancerCardController')->only([
-            'index', 'store', 'show', 'update', 'destroy'
+            'index', 'store', 'show', 'destroy'
         ]);
-        Route::resource('/card', 'App\Http\Controllers\CardController')->only([
-            'index'
-        ]);
+        Route::put('/ownCard/{cid}/{uid}', ['App\Http\Controllers\FreelancerCardController', 'update']);
+//        Route::resource('/card', 'App\Http\Controllers\CardController')->only([
+//            'index'
+//        ]);
+        Route::post('/filter', ['App\Http\Controllers\CardController', 'filter']);
         Route::resource('/rating', 'App\Http\Controllers\RatingController')->only([
             'store'
+        ]);
+        Route::resource('/save', 'App\Http\Controllers\SavedController')->only([
+            'index', 'store', 'destroy'
+        ]);
+        Route::resource('/categories', 'App\Http\Controllers\CategoryController')->only([
+            'index', 'show'
         ]);
     });
 });

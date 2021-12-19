@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Category;
 use App\Models\FreelancerCategory;
 use Illuminate\Http\Request;
 
@@ -13,6 +12,7 @@ class FreelancerCategoryController extends Controller
      */
     public function index()
     {
+
         $categories = FreelancerCategory::where('freelancer_id', auth('user')->user()->id)->get();
         return response()->json(['status'=>200, 'categories'=>$categories]);
     }
