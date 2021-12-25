@@ -19,66 +19,61 @@ class CardController extends Controller
      */
     public function index()
     {
-//        $freecats = FreelancerCategory::with('category.cardCategory')->where("freelancer_id", auth('user')->user()->id)->orderBy('created_at')->get();
-//        $designerRat = Designer::with('ratings')->get();
-//        $savedCards = Saved::where('freelancer_id', auth('user')->user()->id)->get();
-//        $accepted = FreelancerCard::where('freelancer_id', auth('user')->user()->id)->get();
-//        $cards = [];
-//
-//        foreach ($freecats as $c){
-//            foreach ($c->category->cardCategory as $one){
-//                    array_push($cards, $one->card);
-//            }
-//        }
-//
-//        foreach ($designerRat as $d) {
-//            if (sizeof($d->ratings) > 0) {
-//                $sum = 0;
-//                foreach ($d->ratings as $instance) {
-//                    $sum += $instance->rating;
-//                }
-//                if (($sum / sizeof($d->ratings) - floor($sum / sizeof($d->ratings)) >= 0.75)) {
-//                    $d->rating = ceil($sum / sizeof($d->ratings));
-//                } else {
-//                    $d->rating = floor($sum / sizeof($d->ratings));
-//                }
-//            }
-//            else{
-//                $d->rating = 0;
-//            }
-//        }
-//
-//        foreach ($cards as $c) {
-//            $count = 0;
-//            $c->posts;
-//            $c->saved = 0;
-//            $c->accepted = 0;
-//            foreach ($savedCards as $s) {
-//                if($c->id == $s->card_id){
-//                    $c->saved = 1;
-//                }
-//            }
-//            foreach ($accepted as $a) {
-//                if($c->id == $a->card_id){
-//                    $c->accepted = $a->accepted;
-//                }
-//            }
-//            foreach ($designerRat as $d) {
-//                if($d->id == $c->designer->id) {
-//                    $c->designer->rating = $d->rating;
-//                }
-//            }
-//            foreach($c->categories as $cat){
-//                $cat->category;
-//            }
-//
-//            for ($i = 0; $i<sizeof($c->users); $i++)
-//                $count++;
-//            $c->applicants = $count;
-//        }
-//
-//        return response()->json(['length'=>sizeof(array_unique($cards)), 'status'=>200, 'cards'=>array_unique($cards)]);
-//        return response()->json(['length'=>sizeof(array_unique($cards)), 'status'=>200, 'cards'=>$accepted]);
+        $designerRat = Designer::with('ratings')->get();
+        $savedCards = Saved::where('freelancer_id', auth('user')->user()->id)->get();
+        $accepted = FreelancerCard::where('freelancer_id', auth('user')->user()->id)->get();
+        $cards = Card::with('users', 'categories.category', 'posts', 'designer')->get();
+
+        foreach ($designerRat as $d) {
+            if (sizeof($d->ratings) > 0) {
+                $sum = 0;
+                foreach ($d->ratings as $instance) {
+                    $sum += $instance->rating;
+                }
+                if (($sum / sizeof($d->ratings) - floor($sum / sizeof($d->ratings)) >= 0.75)) {
+                    $d->rating = ceil($sum / sizeof($d->ratings));
+                } else {
+                    $d->rating = floor($sum / sizeof($d->ratings));
+                }
+            }
+            else{
+                $d->rating = 0;
+            }
+        }
+
+        foreach ($cards as $c) {
+            $count = 0;
+            $c->saved = 0;
+            $c->accepted = 0;
+            $c->applied= 0;
+            foreach ($savedCards as $s) {
+                if($c->id == $s->card_id){
+                    $c->saved = 1;
+                }
+            }
+            foreach ($accepted as $a) {
+                if($c->id == $a->card_id){
+                    $c->accepted = $a->accepted;
+                }
+                if($c->id == $a->card_id){
+                    $c->applied = 1;
+                }
+            }
+            foreach ($designerRat as $d) {
+                if($d->id == $c->designer->id) {
+                    $c->designer->rating = $d->rating;
+                }
+            }
+            foreach($c->categories as $cat){
+                $cat->category;
+            }
+
+            for ($i = 0; $i<sizeof($c->users); $i++)
+                $count++;
+            $c->applicants = $count;
+        }
+
+        return response()->json(['length'=>sizeof($cards), 'status'=>200, 'cards'=>$cards]);
     }
 
     /**
@@ -113,10 +108,10 @@ class CardController extends Controller
 
         foreach ($cards as $c) {
             $count = 0;
-            $c->posts;
             $c->saved = 0;
             $c->accepted = 0;
             $c->applied = 0;
+            $c->posts;
             foreach ($savedCards as $s) {
                 if($c->id == $s->card_id){
                     $c->saved = 1;
@@ -146,6 +141,94 @@ class CardController extends Controller
         }
 
         return response()->json(['length'=>sizeof(array_unique($cardCategories)), 'status'=>200, 'cards'=>array_unique($cardCategories)]);
+    }
+
+    public function getJobs(){
+        $jobs = Card::with('posts', 'users.freelancer.posts', 'designer.ratings', 'categories.category')->where('designer_id', auth('designer')->user()->id)->get();
+
+        foreach ($jobs as $j){
+            $count = 0;
+            foreach ($j->users as $user) {
+                $count++;
+            }
+            $j->applicants = $count;
+            $sum = 0;
+            foreach ($j->designer->ratings as $r) {
+                    $sum += $r->rating;
+            }
+            if (($sum / sizeof($j->designer->ratings) - floor($sum / sizeof($j->designer->ratings)) >= 0.75)) {
+                $j->designer->rating = ceil($sum / sizeof($j->designer->ratings));
+            } else {
+                $j->designer->rating = floor($sum / sizeof($j->designer->ratings));
+            }
+        }
+
+        return response()->json(['length'=>sizeof($jobs), 'status'=>200, 'jobs'=>$jobs]);
+    }
+
+    /**
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function accepted()
+    {
+        $designerRat = Designer::with('ratings')->get();
+        $savedCards = Saved::where('freelancer_id', auth('user')->user()->id)->get();
+        $accepted = FreelancerCard::where('freelancer_id', auth('user')->user()->id)->get();
+        $cards = Card::with('users', 'categories.category', 'posts', 'designer')->get();
+        $acc = [];
+
+        foreach ($designerRat as $d) {
+            if (sizeof($d->ratings) > 0) {
+                $sum = 0;
+                foreach ($d->ratings as $instance) {
+                    $sum += $instance->rating;
+                }
+                if (($sum / sizeof($d->ratings) - floor($sum / sizeof($d->ratings)) >= 0.75)) {
+                    $d->rating = ceil($sum / sizeof($d->ratings));
+                } else {
+                    $d->rating = floor($sum / sizeof($d->ratings));
+                }
+            } else {
+                $d->rating = 0;
+            }
+        }
+
+        foreach ($cards as $c) {
+            $count = 0;
+            $c->saved = 0;
+            $c->accepted = 0;
+            $c->applied = 0;
+            foreach ($savedCards as $s) {
+                if ($c->id == $s->card_id) {
+                    $c->saved = 1;
+                }
+            }
+            foreach ($accepted as $a) {
+                if ($c->id == $a->card_id) {
+                    $c->accepted = $a->accepted;
+                }
+                if($c->id == $a->card_id){
+                    $c->applied = 1;
+                }
+            }
+            foreach ($designerRat as $d) {
+                if ($d->id == $c->designer->id) {
+                    $c->designer->rating = $d->rating;
+                }
+            }
+            foreach ($c->categories as $cat) {
+                $cat->category;
+            }
+
+            for ($i = 0; $i < sizeof($c->users); $i++)
+                $count++;
+            $c->applicants = $count;
+            if($c->accepted == 1) {
+                array_push($acc, $c);
+            }
+        }
+
+        return response()->json(['length' => sizeof($acc), 'status' => 200, 'cards' => $acc]);
     }
 
     /**

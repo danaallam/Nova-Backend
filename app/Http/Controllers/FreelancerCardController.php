@@ -89,7 +89,7 @@ class FreelancerCardController extends Controller
     {
         $inputs = $request->all();
         $userCard = new FreelancerCard();
-        $userCard->resume = $request->file('resume')->store('resume');
+        $userCard->resume = $inputs['resume'];
         if($request->file('coverLetter') != null)
             $userCard->coverLetter = $request->file('coverLetter')->store('coverLetter');
         $userCard->accepted = 0;
@@ -117,9 +117,10 @@ class FreelancerCardController extends Controller
      * @param $uid
      * @return \Illuminate\Http\JsonResponse
      */
-    public function update($cid, $uid)
+    public function update(Request $request)
     {
-        $card = FreelancerCard::where('card_id', $cid)->where('freelancer_id', $uid)->first();
+        $inputs = $request->all();
+        $card = FreelancerCard::where('card_id', $inputs['card_id'])->where('freelancer_id', $inputs['freelancer_id'])->first();
         if($card) {
             $card->accepted = 1;
             $card->save();
@@ -136,13 +137,23 @@ class FreelancerCardController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\FreelancerCard  $freelancerCard
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy(FreelancerCard $freelancerCard)
+    public function destroy(Request $request)
     {
-        //
+        $inputs = $request->all();
+        $card = FreelancerCard::where('card_id', $inputs['card_id'])->where('freelancer_id', $inputs['freelancer_id'])->first();
+        if($card) {
+            $card->delete();
+            return response()->json([
+                'status' => '200',
+                'message' => 'Application rejected'
+            ]);
+        }
+        return response()->json([
+            'status' => '200',
+            'message' => 'Application not found'
+        ]);
     }
 }

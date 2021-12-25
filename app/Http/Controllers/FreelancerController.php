@@ -20,9 +20,24 @@ class FreelancerController extends Controller
         $user->password = $request->password;
         if($request->file('profile') != null)
             $user->profile = $request->file('profile')->store('tailorProfile');
+        $user->resume = null;
+        $user->link = "";
+        $user->experience = 0;
+        $user->phone = "";
         $user->save();
         $token = auth('user')->login($user);
         return $this->respondWithToken($token);
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function setResume(Request $request){
+        $user = User::where('id', auth('user')->user()->id)->first();
+        $user->resume = $request->file('resume')->store('resume');
+        $user->save();
+        return response()->json(['message'=>'Resume saved', 'user'=>$user]);
     }
 
     public function login()
@@ -39,7 +54,6 @@ class FreelancerController extends Controller
     public function logout()
     {
         auth('user')->logout();
-
         return response()->json(['message' => 'Successfully logged out']);
     }
 
@@ -51,9 +65,14 @@ class FreelancerController extends Controller
     {
         return response()->json([
             'access_token' => $token,
-            'token_type'   => 'bearer',
-            'expires_in'   => auth('user')->factory()->getTTL() * 60,
+            'token_type' => 'bearer',
+            'expires_in' => auth('user')->factory()->getTTL() * 60,
             'user' => auth('user')->user()
         ]);
+    }
+
+    public function getUsers(){
+        $users = User::with('posts')->get();
+        return response()->json(['status'=>200, 'users'=>$users]);
     }
 }

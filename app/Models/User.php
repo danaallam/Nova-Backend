@@ -19,7 +19,7 @@ class User extends Authenticatable implements JWTSubject
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'profile'
+        'name', 'email', 'password', 'profile', 'resume', 'experience', 'phone', 'link'
     ];
 
     /**
@@ -70,6 +70,10 @@ class User extends Authenticatable implements JWTSubject
 
     public function category(){
         return $this->hasMany(FreelancerCategory::class, 'freelancer_id', 'id');
+    }
+
+    public function posts(){
+        return $this->hasMany(UserPost::class, 'freelancer_id', 'id');
     }
 
 }

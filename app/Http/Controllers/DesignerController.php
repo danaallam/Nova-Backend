@@ -29,7 +29,7 @@ class DesignerController extends Controller
         $credentials = request(['email', 'password']);
 
         if (! $token = auth('designer')->attempt($credentials)) {
-            return response()->json(['error' => 'Unauthorized'], 401);
+            return response()->json(['error' => 'Invalid email or password'], 401);
         }
 
         return $this->respondWithToken($token);
