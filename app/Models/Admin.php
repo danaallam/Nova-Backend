@@ -2,14 +2,16 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class User extends Authenticatable implements JWTSubject
+class Admin extends Authenticatable implements JWTSubject
 {
     use Notifiable;
 
@@ -19,7 +21,7 @@ class User extends Authenticatable implements JWTSubject
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'profile', 'resume', 'experience', 'phone', 'link'
+        'name', 'email', 'password',
     ];
 
     /**
@@ -55,25 +57,4 @@ class User extends Authenticatable implements JWTSubject
             $this->attributes['password'] = bcrypt($password);
         }
     }
-
-    public function rating(){
-        return $this->hasMany(Rating::class, 'freelancer_id', 'id');
-    }
-
-    public function savedCards(){
-        return $this->hasMany(Saved::class, 'freelancer_id', 'id');
-    }
-
-    public function application(){
-        return $this->hasMany(FreelancerCard::class, 'freelancer_id', 'id');
-    }
-
-    public function category(){
-        return $this->hasMany(FreelancerCategory::class, 'freelancer_id', 'id');
-    }
-
-    public function posts(){
-        return $this->hasMany(UserPost::class, 'freelancer_id', 'id');
-    }
-
 }
